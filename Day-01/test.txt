@@ -1,0 +1,5 @@
+extensions:
+
+*jupyter
+*codex
+*github copilot

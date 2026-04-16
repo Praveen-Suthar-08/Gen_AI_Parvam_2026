@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration Form</title>
+    <style>
+        :root{
+            --bg:#0f1724;
+            --card:#0b1220;
+            --glass: rgba(255,255,255,0.03);
+            --accent:#6b46c1;
+            --accent-2:#3a7bbf;
+            --muted:rgba(230,238,248,0.7);
+            --success:#d4edda;
+            --danger:#ffecec;
+            --radius:14px;
+            --glass-border: rgba(255,255,255,0.04);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{height:100%}
+        body{
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: linear-gradient(180deg,#061025 0%, #071226 60%);
+            display:flex;align-items:center;justify-content:center;padding:36px;color:#e6eef8;
+        }
+
+        .wrap{width:100%;max-width:760px}
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+        .brand{font-weight:700;letter-spacing:0.3px}
+        .theme-toggle{background:transparent;border:1px solid var(--glass-border);padding:8px 12px;border-radius:999px;color:var(--muted);cursor:pointer}
+
+        .container{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:var(--radius);padding:28px;box-shadow:0 12px 40px rgba(2,6,23,0.6);border:1px solid var(--glass-border)}
+        h1{font-size:20px;margin-bottom:8px}
+        p.lead{color:var(--muted);margin-bottom:18px}
+
+        .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+
+        form{display:block}
+        .form-group{margin-bottom:14px}
+        label{display:block;margin-bottom:6px;color:var(--muted);font-size:13px}
+        .field{position:relative}
+        input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--glass-border);background:transparent;color:inherit;font-size:14px}
+        input:focus{outline:none;box-shadow:0 6px 18px rgba(58,123,191,0.06);border-color:var(--accent-2)}
+        .error{color:#ffb4b4;font-size:12px;margin-top:6px;display:none}
+        input.invalid{border-color:#ffb4b4}
+
+        .actions{display:flex;gap:12px;margin-top:8px}
+        .btn{padding:12px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:700}
+        .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff}
+        .btn.ghost{background:transparent;border:1px solid var(--glass-border);color:var(--muted)}
+
+        .meta{font-size:13px;color:var(--muted);margin-top:10px}
+
+        /* password strength */
+        .pw-meter{height:8px;border-radius:8px;background:rgba(255,255,255,0.03);overflow:hidden}
+        .pw-meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff6b6b,#ffd166);transition:width .25s}
+
+        .card-right{padding:16px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid var(--glass-border)}
+
+        /* spinner */
+        .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,0.08);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle}
+        @keyframes spin{to{transform:rotate(360deg)}}
+
+        /* success modal */
+        .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.98);background:linear-gradient(180deg,#f7fffb,#dff7ea);padding:22px;border-radius:12px;display:none;box-shadow:0 12px 40px rgba(2,6,23,0.4)}
+        .modal.show{display:block;animation:pop .18s ease-out forwards}
+        @keyframes pop{from{transform:translate(-50%,-50%) scale(.96);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+
+        .honeypot{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="topbar">
+            <div class="brand">ZeroShot · <span style="opacity:.8">Student Registration</span></div>
+            <button id="themeToggle" class="theme-toggle" aria-pressed="false">Toggle Theme</button>
+        </div>
+
+        <div class="container">
+            <div class="grid">
+                <div>
+                    <h1>Register</h1>
+                    <p class="lead">Create an account quickly — progressive validation, strength meter, and local save.</p>
+
+                    <form id="registrationForm" onsubmit="validateForm(event)" aria-describedby="formHelp">
+                        <div class="honeypot" aria-hidden="true"><label>Do not fill<input type="text" name="website" id="website"></label></div>
+
+                        <div class="form-group field">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Full name" aria-required="true">
+                            <div class="error" id="nameError">Name must be at least 3 characters long</div>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="usn">USN</label>
+                            <input type="text" id="usn" name="usn" placeholder="1RV19CS001" aria-required="true">
+                            <div class="error" id="usnError">USN must be in valid format</div>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="name@example.com" aria-required="true">
+                            <div class="error" id="emailError">Please enter a valid email address</div>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" placeholder="Choose a secure password" aria-required="true">
+                            <div class="pw-meter" aria-hidden="true"><i id="pwBar"></i></div>
+                            <div class="error" id="passwordError">Password must be at least 6 characters long</div>
+                            <div style="margin-top:6px;display:flex;gap:8px;align-items:center"><button type="button" class="btn ghost" id="togglePw">Show</button><div id="pwMsg" class="small muted"></div></div>
+                        </div>
+
+                        <div class="form-group field">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat password" aria-required="true">
+                            <div class="error" id="confirmPasswordError">Passwords do not match</div>
+                        </div>
+
+                        <div class="actions">
+                            <button type="submit" class="btn primary" id="submitBtn"><span id="btnText">Register</span> <span id="btnSpinner" style="margin-left:8px;display:none" aria-hidden="true" class="spinner"></span></button>
+                            <button type="button" class="btn ghost" id="saveLocal">Save</button>
+                        </div>
+
+                        <div class="meta" id="formHelp">Your data is stored locally in your browser unless you submit.</div>
+                    </form>
+                </div>
+
+                <!-- Right-side panel moved to floating popup -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating popup toggle and panel (top-right) -->
+    <button id="popupToggle" aria-expanded="false" title="Show tips" style="position:fixed;right:24px;top:24px;z-index:1100;padding:10px 12px;border-radius:999px;border:1px solid var(--glass-border);background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer">Tips</button>
+
+    <aside id="floatingPanel" class="card-right" style="position:fixed;right:24px;top:64px;width:320px;z-index:1099;box-shadow:0 12px 40px rgba(2,6,23,0.6);display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0">Quick tips</h3>
+            <button id="closePanel" class="btn ghost" style="padding:6px 8px;border-radius:8px">Close</button>
+        </div>
+        <ul style="color:var(--muted);margin-left:18px;margin-top:10px">
+            <li>Use a strong password — mix letters, numbers, and symbols.</li>
+            <li>USN should be alphanumeric, at least 8 chars.</li>
+            <li>Your progress is saved locally with the <strong>Save</strong> button.</li>
+        </ul>
+        <div style="margin-top:12px">
+            <strong>Recent</strong>
+            <div id="recent" style="margin-top:8px;color:var(--muted)">No saved entries</div>
+        </div>
+    </aside>
+
+    <div class="modal" id="successModal" role="dialog" aria-modal="true"><div style="font-weight:700;color:#064e1a;margin-bottom:8px">Success</div><div id="modalMsg">Registration successful</div></div>
+    
+    <script>
+        // --- Utilities ---
+        const $ = (id) => document.getElementById(id);
+
+        function passwordStrength(pw){
+            let score = 0;
+            if (!pw) return 0;
+            if (pw.length >= 6) score++;
+            if (pw.length >= 10) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            return score; // 0..5
+        }
+
+        function updatePwUI(){
+            const pw = $('password').value;
+            const s = passwordStrength(pw);
+            const pwBar = $('pwBar');
+            const pct = Math.min(100, Math.round((s/5)*100));
+            pwBar.style.width = pct+'%';
+            let msg = '';
+            if (s <= 1) { msg = 'Too weak'; pwBar.style.background='linear-gradient(90deg,#ff6b6b,#ffb86b)'; }
+            else if (s <= 3) { msg = 'Fair'; pwBar.style.background='linear-gradient(90deg,#ffd166,#a0f0a6)'; }
+            else { msg = 'Strong'; pwBar.style.background='linear-gradient(90deg,#9be15d,#00e3ae)'; }
+            $('pwMsg').textContent = msg;
+        }
+
+        // restore from localStorage
+        function restoreLocal(){
+            try{
+                const saved = JSON.parse(localStorage.getItem('zs_form')||'null');
+                if(saved){
+                    ['name','usn','email'].forEach(k=>{ if(saved[k]) $(k).value = saved[k]; });
+                    $('recent').textContent = saved.name?('Last saved: '+saved.name):'No saved entries';
+                }
+            }catch(e){console.warn(e)}
+        }
+
+        // save to localStorage
+        function saveLocal(){
+            const payload = { name:$('name').value.trim(), usn:$('usn').value.trim(), email:$('email').value.trim(), ts:Date.now() };
+            localStorage.setItem('zs_form', JSON.stringify(payload));
+            $('recent').textContent = 'Last saved: '+(payload.name||'—');
+            alert('Saved locally');
+        }
+
+        // theme toggle
+        const themeToggle = $('themeToggle');
+        themeToggle.addEventListener('click', ()=>{
+            const cur = document.documentElement.style.getPropertyValue('--bg');
+            if(cur.trim()==='#0f1724'){
+                document.documentElement.style.setProperty('--bg','#ffffff');
+                document.body.style.background = '#f7fafc';
+                themeToggle.textContent = 'Light';
+            } else {
+                document.documentElement.style.setProperty('--bg','#0f1724');
+                document.body.style.background = 'linear-gradient(180deg,#061025 0%, #071226 60%)';
+                themeToggle.textContent = 'Dark';
+            }
+        });
+
+        // show/hide password
+        $('togglePw').addEventListener('click', ()=>{
+            const p = $('password');
+            if(p.type==='password'){ p.type='text'; $('togglePw').textContent='Hide'; }
+            else { p.type='password'; $('togglePw').textContent='Show'; }
+        });
+
+        $('password').addEventListener('input', updatePwUI);
+
+        $('saveLocal').addEventListener('click', saveLocal);
+
+        // form validation + submit
+        function validateForm(event){
+            event.preventDefault();
+            const form = $('registrationForm');
+            const name = $('name').value.trim();
+            const usn = $('usn').value.trim();
+            const email = $('email').value.trim();
+            const password = $('password').value;
+            const confirmPassword = $('confirmPassword').value;
+            const honeypot = $('website') && $('website').value;
+
+            // clear
+            document.querySelectorAll('.error').forEach(e=>e.style.display='none');
+            document.querySelectorAll('input').forEach(i=>i.classList.remove('invalid'));
+
+            if(honeypot){ alert('Bot detected'); return; }
+
+            let ok = true;
+            if(name.length < 3){ $('nameError').style.display='block'; $('name').classList.add('invalid'); ok=false; }
+            const usnRegex = /^[A-Z0-9]{6,}$/i; if(!usnRegex.test(usn)){ $('usnError').style.display='block'; $('usn').classList.add('invalid'); ok=false; }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; if(!emailRegex.test(email)){ $('emailError').style.display='block'; $('email').classList.add('invalid'); ok=false; }
+            if(password.length < 6){ $('passwordError').style.display='block'; $('password').classList.add('invalid'); ok=false; }
+            if(password !== confirmPassword){ $('confirmPasswordError').style.display='block'; $('confirmPassword').classList.add('invalid'); ok=false; }
+
+            if(!ok) return;
+
+            // simulate submit with spinner
+            $('btnText').textContent = 'Processing';
+            $('btnSpinner').style.display = 'inline-block';
+            $('submitBtn').disabled = true;
+
+            setTimeout(()=>{
+                $('btnSpinner').style.display = 'none';
+                $('btnText').textContent = 'Register';
+                $('submitBtn').disabled = false;
+                // show modal
+                const m = $('successModal'); m.classList.add('show');
+                setTimeout(()=>{ m.classList.remove('show'); }, 2500);
+                form.reset(); updatePwUI();
+            }, 1200);
+        }
+
+        // init
+        restoreLocal(); updatePwUI();
+
+        // floating popup toggle behavior
+        const popupToggle = $('popupToggle');
+        const floatingPanel = $('floatingPanel');
+        const closePanel = $('closePanel');
+        popupToggle.addEventListener('click', ()=>{
+            const shown = floatingPanel.style.display === 'block';
+            floatingPanel.style.display = shown ? 'none' : 'block';
+            popupToggle.setAttribute('aria-expanded', !shown);
+        });
+        closePanel.addEventListener('click', ()=>{ floatingPanel.style.display = 'none'; popupToggle.setAttribute('aria-expanded', false); });
+    </script>
+</body>
+</html>

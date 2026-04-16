@@ -1,0 +1,700 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Multi-Shot Authentication & Data Management</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .container {
+                width: 100%;
+                max-width: 900px;
+            }
+
+            /* Authentication Page */
+            .auth-page {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                padding: 60px 40px;
+                text-align: center;
+                animation: slideIn 0.5s ease-out;
+            }
+
+            .auth-page h1 {
+                color: #333;
+                margin-bottom: 30px;
+                font-size: 32px;
+            }
+
+            .auth-page p {
+                color: #666;
+                margin-bottom: 50px;
+                font-size: 16px;
+            }
+
+            .button-group {
+                display: flex;
+                gap: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .auth-btn {
+                padding: 15px 50px;
+                font-size: 18px;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .student-btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .student-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            }
+
+            .teacher-btn {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+            }
+
+            .teacher-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+            }
+
+            /* Data Page */
+            .data-page {
+                display: none;
+                animation: slideIn 0.5s ease-out;
+            }
+
+            .data-page.active {
+                display: block;
+            }
+
+            .data-header {
+                background: white;
+                border-radius: 20px 20px 0 0;
+                padding: 30px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            }
+
+            .header-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .header-title {
+                color: #333;
+                font-size: 28px;
+                font-weight: 700;
+            }
+
+            .user-info {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 10px 20px;
+                border-radius: 50px;
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+            .back-btn {
+                background: #ff6b6b;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 50px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .back-btn:hover {
+                background: #ff5252;
+                transform: scale(1.05);
+            }
+
+            .search-filter-section {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr auto;
+                gap: 15px;
+                margin-top: 20px;
+            }
+
+            .search-box {
+                position: relative;
+            }
+
+            .search-box input {
+                width: 100%;
+                padding: 12px 40px 12px 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 50px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .search-box input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .search-icon {
+                position: absolute;
+                right: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #999;
+            }
+
+            .filter-select {
+                padding: 12px 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 50px;
+                font-size: 14px;
+                cursor: pointer;
+                background: white;
+                transition: all 0.3s ease;
+            }
+
+            .filter-select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .reset-btn {
+                padding: 12px 25px;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                border: none;
+                border-radius: 50px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+            }
+
+            .reset-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(245, 87, 108, 0.3);
+            }
+
+            /* Data Table */
+            .data-container {
+                background: white;
+                border-radius: 0 0 20px 20px;
+                padding: 30px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                overflow-x: auto;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            table thead {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            table th {
+                padding: 15px;
+                text-align: left;
+                font-weight: 600;
+                letter-spacing: 0.5px;
+            }
+
+            table td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #f0f0f0;
+                color: #555;
+            }
+
+            table tbody tr {
+                transition: all 0.3s ease;
+            }
+
+            table tbody tr:hover {
+                background: #f8f9ff;
+                transform: scale(1.01);
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .status-active {
+                background: #d4edda;
+                color: #155724;
+            }
+
+            .status-inactive {
+                background: #f8d7da;
+                color: #721c24;
+            }
+
+            .status-pending {
+                background: #fff3cd;
+                color: #856404;
+            }
+
+            .no-results {
+                text-align: center;
+                padding: 40px;
+                color: #999;
+                font-size: 16px;
+            }
+
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .result-info {
+                margin-top: 15px;
+                color: #666;
+                font-size: 14px;
+            }
+
+            /* Registration Page */
+            .registration-page {
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                padding: 60px 40px;
+                max-width: 500px;
+                margin: 0 auto;
+                animation: slideIn 0.5s ease-out;
+            }
+
+            .registration-page.active {
+                display: block;
+            }
+
+            .registration-page h1 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 28px;
+            }
+
+            .registration-page p {
+                color: #999;
+                margin-bottom: 30px;
+                font-size: 14px;
+            }
+
+            .form-group {
+                margin-bottom: 20px;
+            }
+
+            .form-group label {
+                display: block;
+                color: #333;
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 12px 15px;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 14px;
+                transition: all 0.3s ease;
+                font-family: inherit;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .role-selector {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .role-option {
+                position: relative;
+            }
+
+            .role-option input[type="radio"] {
+                display: none;
+            }
+
+            .role-label {
+                display: block;
+                padding: 15px;
+                text-align: center;
+                border: 2px solid #e0e0e0;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                font-weight: 600;
+            }
+
+            .role-option input[type="radio"]:checked + .role-label {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border-color: #667eea;
+            }
+
+            .form-button-group {
+                display: flex;
+                gap: 10px;
+            }
+
+            .form-button-group button {
+                flex: 1;
+                padding: 12px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 14px;
+                transition: all 0.3s ease;
+            }
+
+            .register-btn {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+            }
+
+            .register-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            }
+
+            .cancel-btn {
+                background: #e0e0e0;
+                color: #333;
+            }
+
+            .cancel-btn:hover {
+                background: #d0d0d0;
+            }
+
+            .teacher-features {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 20px;
+                display: none;
+            }
+
+            .teacher-features.active {
+                display: block;
+            }
+
+            .feature-item {
+                padding: 10px 0;
+                font-size: 14px;
+            }
+
+            .feature-item::before {
+                content: "✓ ";
+                font-weight: bold;
+                margin-right: 5px;
+            }
+
+            .student-features {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 20px;
+                display: none;
+            }
+
+            .student-features.active {
+                display: block;
+            }
+
+            .assignment-section {
+                background: #f8f9ff;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 20px;
+                display: none;
+            }
+
+            .assignment-section.active {
+                display: block;
+            }
+
+            .assignment-item {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 10px;
+                border-left: 4px solid #667eea;
+            }
+
+            .assignment-title {
+                font-weight: 600;
+                color: #333;
+            }
+
+            .assignment-due {
+                font-size: 12px;
+                color: #999;
+                margin-top: 5px;
+            }
+
+            .grade-display {
+                font-size: 16px;
+                font-weight: bold;
+                color: #667eea;
+            }
+
+            @media (max-width: 768px) {
+                .search-filter-section {
+                    grid-template-columns: 1fr;
+                }
+
+                .header-top {
+                    flex-direction: column;
+                }
+
+                .auth-page {
+                    padding: 40px 20px;
+                }
+
+                .registration-page {
+                    padding: 40px 20px;
+                }
+
+                .button-group {
+                    flex-direction: column;
+                }
+
+                .auth-btn {
+                    width: 100%;
+                }
+
+                .role-selector {
+                    grid-template-columns: 1fr;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Authentication Page -->
+            <div class="auth-page" id="authPage">
+                <h1>🎓 Educational Portal</h1>
+                <p>Welcome! Please select your role to continue</p>
+                <div class="button-group">
+                    <button class="auth-btn student-btn" onclick="goToData('Student')">👨‍🎓 Login as Student</button>
+                    <button class="auth-btn teacher-btn" onclick="goToData('Teacher')">👨‍🏫 Login as Teacher</button>
+                </div>
+            </div>
+
+            <!-- Data Management Page -->
+            <div class="data-page" id="dataPage">
+                <div class="data-header">
+                    <div class="header-top">
+                        <h1 class="header-title">📊 Data Management Portal</h1>
+                        <div class="user-info" id="userRole"></div>
+                        <button class="back-btn" onclick="goBack()">← Back to Login</button>
+                    </div>
+
+                    <div class="search-filter-section">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="🔍 Search by name or email..." onkeyup="filterData()">
+                        </div>
+                        <select class="filter-select" id="statusFilter" onchange="filterData()">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                        <select class="filter-select" id="departmentFilter" onchange="filterData()">
+                            <option value="">All Departments</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Physics">Physics</option>
+                            <option value="English">English</option>
+                            <option value="History">History</option>
+                        </select>
+                        <button class="reset-btn" onclick="resetFilters()">🔄 Reset</button>
+                    </div>
+                    <div class="result-info" id="resultInfo"></div>
+                </div>
+
+                <div class="data-container">
+                    <div class="table-wrapper">
+                        <table id="dataTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Enrollment Date</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="noResults" class="no-results"></div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const departments = ['Computer Science', 'Mathematics', 'Physics', 'English', 'History', 'Biology', 'Chemistry', 'Art', 'Music', 'Sports'];
+            const statuses = ['Active', 'Inactive', 'Pending'];
+            const firstNames = ['John', 'Jane', 'Michael', 'Sarah', 'David', 'Emma', 'Robert', 'Olivia', 'James', 'Sophia', 'William', 'Ava', 'Benjamin', 'Isabella', 'Lucas', 'Mia', 'Henry', 'Charlotte', 'Alexander', 'Amelia', 'Mason', 'Harper', 'Michael', 'Evelyn', 'Ethan', 'Abigail', 'Daniel', 'Emily', 'Jacob', 'Elizabeth', 'Logan', 'Megan', 'Jackson', 'Lauren', 'Aiden', 'Victoria', 'Samuel', 'Grace', 'Sebastian', 'Chloe', 'Owen', 'Penelope', 'Jayden', 'Layla', 'Gabriel', 'Riley', 'Carter', 'Zoey', 'Elijah', 'Nora'];
+            const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson', 'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin'];
+
+            let allData = [];
+            let currentRole = '';
+
+            function generateDummyData() {
+                allData = [];
+                for (let i = 1; i <= 50; i++) {
+                    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                    allData.push({
+                        id: 1000 + i,
+                        name: `${firstName} ${lastName}`,
+                        email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@edu.com`,
+                        department: departments[Math.floor(Math.random() * departments.length)],
+                        status: statuses[Math.floor(Math.random() * statuses.length)],
+                        enrollmentDate: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString(),
+                        score: Math.floor(Math.random() * 100)
+                    });
+                }
+            }
+
+            function goToData(role) {
+                currentRole = role;
+                document.getElementById('authPage').style.display = 'none';
+                document.getElementById('dataPage').classList.add('active');
+                document.getElementById('userRole').textContent = `${role} Account`;
+                generateDummyData();
+                displayData(allData);
+            }
+
+            function goBack() {
+                document.getElementById('authPage').style.display = 'block';
+                document.getElementById('dataPage').classList.remove('active');
+                document.getElementById('searchInput').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('departmentFilter').value = '';
+                allData = [];
+            }
+
+            function displayData(data) {
+                const tableBody = document.getElementById('tableBody');
+                const noResults = document.getElementById('noResults');
+                const resultInfo = document.getElementById('resultInfo');
+
+                tableBody.innerHTML = '';
+                noResults.innerHTML = '';
+
+                if (data.length === 0) {
+                    noResults.textContent = '❌ No records found. Try adjusting your search or filters.';
+                } else {
+                    data.forEach(record => {
+                        const row = document.createElement('tr');
+                        const statusClass = record.status === 'Active' ? 'status-active' : record.status === 'Inactive' ? 'status-inactive' : 'status-pending';
+                        row.innerHTML = `
+                            <td>#${record.id}</td>
+                            <td>${record.name}</td>
+                            <td>${record.email}</td>
+                            <td>${record.department}</td>
+                            <td><span class="status-badge ${statusClass}">${record.status}</span></td>
+                            <td>${record.enrollmentDate}</td>
+                            <td><strong>${record.score}%</strong></td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+
+                resultInfo.textContent = `Showing ${data.length} of ${allData.length} records`;
+            }
+
+            function filterData() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const statusFilter = document.getElementById('statusFilter').value;
+                const departmentFilter = document.getElementById('departmentFilter').value;
+
+                const filtered = allData.filter(item => {
+                    const matchesSearch = item.name.toLowerCase().includes(searchTerm) || item.email.toLowerCase().includes(searchTerm);
+                    const matchesStatus = statusFilter === '' || item.status === statusFilter;
+                    const matchesDepartment = departmentFilter === '' || item.department === departmentFilter;
+                    return matchesSearch && matchesStatus && matchesDepartment;
+                });
+
+                displayData(filtered);
+            }
+
+            function resetFilters() {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('statusFilter').value = '';
+                document.getElementById('departmentFilter').value = '';
+                displayData(allData);
+            }
+        </script>
+    </body>
+    </html>
