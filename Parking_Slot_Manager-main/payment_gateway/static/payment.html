@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="/static/payment.css">
+  <title>PayPark — Payment Gateway</title>
+</head>
+<body>
+  <!-- Top Nav -->
+  <nav class="top-nav">
+    <div class="flex items-center gap-2 font-bold text-xl font-['Space_Grotesk'] text-[#3b82f6]">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+      PayPark
+    </div>
+    
+    <div class="flex gap-2 flex-1 justify-center relative">
+      <button class="nav-tab active" data-tab="payment">Payment</button>
+      <button class="nav-tab" data-tab="wallet">Wallet</button>
+      <button class="nav-tab" data-tab="transactions">Transactions</button>
+      <button class="nav-tab" data-tab="refunds">Refunds</button>
+      <button class="nav-tab" data-tab="dashboard">Dashboard</button>
+      <button class="nav-tab" data-tab="settings">Settings</button>
+    </div>
+
+    <div class="flex items-center gap-2 bg-[#1e293b] px-4 py-2 rounded-lg text-sm font-semibold text-[#10b981]">
+      <span>Wallet:</span>
+      <span id="nav-wallet-balance">₹ --</span>
+    </div>
+  </nav>
+
+  <!-- Content area -->
+  <div class="content-area">
+    <!-- TAB 1: PAYMENT -->
+    <section id="tab-payment">
+      <div class="flex flex-col md:flex-row gap-8 justify-center">
+        <!-- Invoice Card -->
+        <div class="invoice-card w-full md:w-1/3">
+          <h3 class="m-0 mb-4 text-xl border-b border-[#1e293b] pb-2 text-[#f8fafc]">Parking Invoice</h3>
+          <div class="flex flex-col gap-1 mb-4 text-[#94a3b8]">
+            <div class="invoice-row"><span>Slot ID:</span><span id="invoice-slot" class="font-bold text-white">--</span></div>
+            <div class="invoice-row"><span>Vehicle:</span><span id="invoice-vehicle" class="font-bold text-[#06b6d4]">--</span></div>
+            <div class="invoice-row"><span>Entry:</span><span id="invoice-entry">--</span></div>
+            <div class="invoice-row"><span>Exit:</span><span id="invoice-exit">--</span></div>
+            <div class="invoice-row"><span>Duration:</span><span id="invoice-duration" class="font-bold text-white">--</span></div>
+          </div>
+          
+          <h4 class="m-0 mb-2 mt-4 text-sm uppercase text-[#64748b]">Charges breakdown</h4>
+          <div class="invoice-row"><span>Parking Fee:</span><span id="invoice-subtotal">₹ --</span></div>
+          <div class="invoice-row"><span>Platform Fee:</span><span id="invoice-fee">₹ --</span></div>
+          <div class="invoice-row"><span>GST (18%):</span><span id="invoice-gst">₹ --</span></div>
+          
+          <div id="discount-line" class="invoice-row hidden text-[#10b981]"><span>Discount:</span><span id="invoice-discount">- ₹ 0.00</span></div>
+          
+          <div class="invoice-total-row mt-2"><span>TOTAL DUE:</span><span id="invoice-total">₹ --</span></div>
+          
+          <div class="mt-4 pt-4 border-t border-[#1e293b]">
+            <div class="text-xs text-[#64748b] mb-2 flex justify-between cursor-pointer hover:text-white" onclick="document.getElementById('promo-wrap').classList.toggle('hidden')">
+              <span>Have a promo code? (e.g. PARK10)</span><span>▼</span>
+            </div>
+            <div id="promo-wrap" class="hidden flex gap-2">
+              <input type="text" id="discount-code-input" placeholder="Promocode" class="text-xs uppercase flex-1 py-2">
+              <button class="btn btn-gray py-2 text-xs" onclick="applyDiscount()">Apply</button>
+            </div>
+            <div id="discount-result" class="text-xs mt-1"></div>
+          </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="w-full md:w-1/2">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="m-0 text-xl">Select Payment Method</h3>
+            <div class="flex items-center gap-2 text-xs">
+              <label class="m-0 cursor-pointer text-[#94a3b8] flex items-center gap-1">
+                <input type="checkbox" id="split-toggle" onchange="toggleSplitPayment()"> Split Payment
+              </label>
+            </div>
+          </div>
+          <div id="method-grid" class="method-grid"></div>
+          <div id="payment-form-area" class="pb-10"></div>
+          <div id="saved-cards-section" class="mt-8 hidden border-t border-[#1e293b] pt-4">
+            <h4 class="text-sm text-[#94a3b8] mb-3 uppercase tracking-wide">Saved Cards</h4>
+            <div id="saved-cards-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW TAB: RECEIPT REDIRECT -->
+    <section id="tab-receipt" class="hidden max-w-2xl mx-auto">
+      <div class="form-card text-center relative overflow-hidden" id="receipt-container">
+         <!-- Populated via JS -->
+      </div>
+      <div class="mt-6 flex gap-4 justify-center">
+         <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+         <button class="btn btn-gray" onclick="showTab('payment')">New Payment</button>
+      </div>
+    </section>
+
+    <!-- TAB 2: WALLET -->
+    <section id="tab-wallet" class="hidden max-w-4xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div class="stat-card flex flex-col justify-center items-center py-10 relative overflow-hidden">
+          <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#10b981] rounded-full blur-[80px] opacity-20"></div>
+          <div class="text-[#94a3b8] uppercase tracking-widest text-sm mb-2">Available Balance</div>
+          <div id="wallet-balance" class="wallet-balance-display">₹ --</div>
+          <div id="wallet-id" class="text-xs text-[#64748b] mt-4 font-mono">WLT-XXX</div>
+        </div>
+        
+        <div class="stat-card">
+          <h3 class="m-0 mb-4 border-b border-[#1e293b] pb-2">Add Money to Wallet</h3>
+          <input type="number" id="topup-amount" placeholder="Enter amount" class="mb-3 text-lg font-bold">
+          <div class="quick-amounts">
+            <button class="quick-amount-btn" onclick="quickTopUp(50)">+ ₹50</button>
+            <button class="quick-amount-btn" onclick="quickTopUp(100)">+ ₹100</button>
+            <button class="quick-amount-btn" onclick="quickTopUp(200)">+ ₹200</button>
+            <button class="quick-amount-btn" onclick="quickTopUp(500)">+ ₹500</button>
+          </div>
+          <button class="btn btn-primary w-full mt-2" onclick="addMoney()">Add Money to Wallet</button>
+          <div class="mt-4 pt-3 border-t border-[#1e293b] flex items-center justify-between text-sm">
+             <span class="text-[#10b981]">Earn 2% cashback</span>
+             <span class="text-[#94a3b8]">on every wallet payment</span>
+          </div>
+        </div>
+      </div>
+      
+      <h3 class="m-0 mb-4">Wallet History</h3>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Date & Time</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead>
+          <tbody id="wallet-history-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 3: TRANSACTIONS -->
+    <section id="tab-transactions" class="hidden">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-value text-[#3b82f6]" id="total-txn-count">0</div><div class="stat-label">Total Transactions</div></div>
+        <div class="stat-card"><div class="stat-value text-[#10b981]" id="total-revenue-stat">₹ 0.00</div><div class="stat-label">Amount Processed</div></div>
+        <div class="stat-card"><div class="stat-value text-[#f59e0b]" id="success-rate-stat">0%</div><div class="stat-label">Success Rate</div></div>
+        <div class="stat-card"><div class="stat-value text-[#a855f7]" id="avg-txn-stat">₹ 0.00</div><div class="stat-label">Avg Transaction</div></div>
+      </div>
+
+      <div class="flex flex-wrap gap-4 mb-6 bg-[#0f172a] p-4 rounded-xl border border-[#1e293b] items-end justify-between">
+        <div class="flex flex-wrap gap-4">
+          <div><label>From Date</label><input type="date" id="filter-from"></div>
+          <div><label>To Date</label><input type="date" id="filter-to"></div>
+          <div><label>Method</label><select id="filter-method"><option>All</option><option value="card">Card</option><option value="upi">UPI</option><option value="wallet">Wallet</option><option value="netbanking">Net Banking</option></select></div>
+          <div><label>Status</label><select id="filter-status"><option>All</option><option value="success">Success</option><option value="failed">Failed</option><option value="refunded">Refunded</option></select></div>
+          <div><button class="btn btn-primary" onclick="applyFilters()">Apply</button> <button class="btn btn-gray ml-2" onclick="resetFilters()">Reset</button></div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-gray" onclick="exportCSV()"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> CSV</button>
+          <button class="btn btn-gray" onclick="exportExcel()"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> XLS</button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>TXN ID</th><th>Date & Time</th><th>Slot / Vehicle</th><th>Method</th><th>Status</th><th>Amount</th><th>Actions</th></tr></thead>
+          <tbody id="transactions-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 4: REFUNDS -->
+    <section id="tab-refunds" class="hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="form-card md:col-span-1 border-[#f59e0b]">
+           <h3 class="m-0 mb-4 text-[#f59e0b]">Request Refund</h3>
+           <div class="flex gap-2 mb-4">
+             <input type="text" id="refund-txn-id" placeholder="TXN-XXXXXX" class="font-mono">
+             <button class="btn btn-primary" onclick="lookupTransaction()">Lookup</button>
+           </div>
+           <form id="refund-form" class="hidden flex-col gap-3">
+             <div class="text-sm bg-[#172554] p-3 rounded-lg border border-[#3b82f6] text-[#94a3b8] mb-2">
+               Found: <span id="rfd-amount" class="text-white font-bold"></span> via <span id="rfd-method" class="text-white"></span>
+             </div>
+             <div><label>Reason</label>
+               <select id="rfd-reason" required>
+                 <option>Duplicate Payment</option><option>Overcharged</option><option>Vehicle not parked</option><option>Other</option>
+               </select>
+             </div>
+             <div><label>Description</label><textarea id="rfd-desc" rows="3" required></textarea></div>
+             <label class="flex items-center gap-2 cursor-pointer mt-2 text-white">
+               <input type="checkbox" id="rfd-orig-method" checked> Refund to original payment method
+             </label>
+             <button type="submit" class="btn btn-primary mt-2">Submit Request</button>
+           </form>
+        </div>
+
+        <div class="md:col-span-2">
+           <h3 class="m-0 mb-4">Refund Tracker</h3>
+           <div class="table-wrapper">
+             <table>
+               <thead><tr><th>Refund ID</th><th>TXN ID</th><th>Reason</th><th>Status</th><th>Submitted</th><th>Amount</th><th>Actions</th></tr></thead>
+               <tbody id="refunds-tbody"></tbody>
+             </table>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: DASHBOARD -->
+    <section id="tab-dashboard" class="hidden">
+       <div class="stats-row" id="dashboard-stats-row"></div>
+       <div class="charts-grid">
+         <div class="chart-card"><h3 class="m-0 mb-4 text-base">Revenue & Refunds (14 Days)</h3><div class="relative w-full" style="height:260px"><canvas id="revenue-chart"></canvas></div></div>
+         <div class="chart-card"><h3 class="m-0 mb-4 text-base">Usage Breakdown</h3><div class="relative w-full" style="height:260px"><canvas id="method-chart"></canvas></div></div>
+       </div>
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+         <div class="chart-card">
+           <h3 class="m-0 mb-4 text-base">Hourly Heatmap (Peak Times)</h3>
+           <div id="heatmap-container" class="heatmap-grid w-full h-[200px]"></div>
+         </div>
+         <div class="chart-card overflow-y-auto">
+           <h3 class="m-0 mb-4 text-base text-[#ef4444]">Recent Failed Payments</h3>
+           <div class="table-wrapper">
+             <table>
+               <thead><tr><th>TXN ID</th><th>Amount</th><th>Method</th><th>Reason</th></tr></thead>
+               <tbody id="recent-failed-tbody"></tbody>
+             </table>
+           </div>
+         </div>
+       </div>
+    </section>
+
+    <!-- TAB 6: SETTINGS -->
+    <section id="tab-settings" class="hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="stat-card">
+           <h3 class="m-0 mb-4 border-b border-[#1e293b] pb-2">Active Methods</h3>
+           <div class="flex flex-col gap-3" id="methods-toggle-container"></div>
+           <h4 class="mt-4 mb-2 text-sm text-[#94a3b8]">Limits</h4>
+           <label>Daily Limit (₹)</label><input type="number" id="setting-limit" class="mb-3">
+           <label>OTP Timeout (s)</label><input type="number" id="setting-otp-time" class="mb-4">
+           <button class="btn btn-primary w-full" onclick="savePaymentSettings()">Save Payment Config</button>
+        </div>
+        <div class="stat-card">
+           <h3 class="m-0 mb-4 border-b border-[#1e293b] pb-2">Fee Configuration</h3>
+           <label>Platform Fee Type</label>
+           <select id="setting-fee-type" class="mb-3"><option value="flat">Flat Amount</option><option value="percent">Percentage</option></select>
+           <label>Platform Fee Value</label><input type="number" step="0.5" id="setting-fee-amt" class="mb-3">
+           <label>GST Rate (%)</label><input type="number" id="setting-gst" class="mb-4">
+           <button class="btn btn-primary w-full" onclick="saveFeeConfig()">Save Fees</button>
+        </div>
+        <div class="stat-card">
+           <h3 class="m-0 mb-4 border-b border-[#1e293b] pb-2">Notifications</h3>
+           <label class="flex items-center justify-between mb-3 cursor-pointer"><span class="text-sm">SMS Notify</span><input type="checkbox" id="setting-sms"></label>
+           <label class="flex items-center justify-between mb-3 cursor-pointer"><span class="text-sm">Email Notify</span><input type="checkbox" id="setting-email"></label>
+           <label>Default Phone</label><input type="text" id="setting-def-phone" class="mb-3">
+           <label>Default Email</label><input type="email" id="setting-def-email" class="mb-4">
+           <button class="btn btn-primary w-full" onclick="saveNotificationSettings()">Save Notifications</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- MODALS -->
+  <div id="modal-otp" class="modal-overlay">
+    <div class="modal-box text-center">
+      <h2 class="m-0 mb-2">Verify Payment</h2>
+      <p class="text-sm text-[#94a3b8] mb-6">Enter the 6-digit OTP sent to your registered mobile ending in 7890 (MOCK: 123456)</p>
+      <div id="otp-inputs" class="otp-container">
+        <input type="text" maxlength="1" class="otp-input" data-index="0">
+        <input type="text" maxlength="1" class="otp-input" data-index="1">
+        <input type="text" maxlength="1" class="otp-input" data-index="2">
+        <input type="text" maxlength="1" class="otp-input" data-index="3">
+        <input type="text" maxlength="1" class="otp-input" data-index="4">
+        <input type="text" maxlength="1" class="otp-input" data-index="5">
+      </div>
+      <div class="flex justify-between items-center text-sm font-medium mt-4">
+        <span id="otp-timer" class="text-[#f59e0b]">Resend in 0:30</span>
+        <span id="otp-resend" class="text-[#3b82f6] cursor-pointer hidden" onclick="resendOTP()">Resend OTP</span>
+      </div>
+      <div id="otp-attempts" class="text-xs mt-2 text-[#ef4444] mb-4"></div>
+      <button class="btn btn-primary w-full mt-4" onclick="verifyOTP()">Verify & Pay</button>
+      <button class="btn btn-gray w-full mt-2" onclick="closeAllModals()">Cancel</button>
+    </div>
+  </div>
+
+  <div id="modal-processing" class="modal-overlay">
+    <div class="modal-box text-center bg-transparent border-0 shadow-none">
+      <div class="spinner mx-auto mb-6"></div>
+      <h2 class="m-0 mb-4 text-[#f8fafc]">Processing Payment...</h2>
+      <div class="progress-bar-track w-full max-w-[300px] mx-auto"><div id="processing-bar" class="progress-bar-fill" style="width: 0%"></div></div>
+      <div id="processing-steps" class="flex flex-col items-center gap-1 mt-6">
+        <div class="processing-step" id="ps-1"><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16 12a4 4 0 0 1-8 0"/></svg> Verifying details...</div>
+        <div class="processing-step" id="ps-2"><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Connecting to bank...</div>
+        <div class="processing-step" id="ps-3"><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Authorizing...</div>
+        <div class="processing-step" id="ps-4"><svg class="step-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg> Completing...</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-success" class="modal-overlay">
+    <div class="modal-box text-center relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#10b981] rounded-full blur-[60px] opacity-20"></div>
+      <div class="success-checkmark mx-auto mb-4 flex justify-center">
+        <svg viewBox="0 0 52 52">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25"/>
+          <path class="checkmark-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+      <h2 class="text-3xl text-[#10b981] mb-2 m-0">Payment Successful!</h2>
+      <p class="text-[#94a3b8] text-sm mb-6">Your transaction has been securely processed.</p>
+      <div class="bg-[#0a0f1e] rounded-lg p-4 border border-[#1e293b] text-left text-sm flex flex-col gap-3 mb-6">
+        <div class="flex justify-between"><span class="text-[#64748b]">Transaction ID</span><span class="font-mono font-bold" id="success-txn-id">--</span></div>
+        <div class="flex justify-between"><span class="text-[#64748b]">Amount Paid</span><span class="font-bold text-[#06b6d4] text-lg" id="success-amount">--</span></div>
+        <div class="flex justify-between"><span class="text-[#64748b]">Method</span><span class="font-bold uppercase" id="success-method">--</span></div>
+        <div class="flex justify-between"><span class="text-[#64748b]">Date & Time</span><span class="font-bold" id="success-time">--</span></div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <button class="btn btn-primary" onclick="downloadReceipt()">Download Receipt</button>
+        <button class="btn btn-gray" onclick="sendReceiptEmail()">Send Receipt to Email</button>
+      </div>
+      <button class="btn btn-gray mt-6 text-xs bg-transparent border border-[#1e293b]" onclick="location.reload()">Return to Invoice</button>
+    </div>
+  </div>
+
+  <div id="modal-failure" class="modal-overlay">
+    <div class="modal-box text-center relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-40 h-40 bg-[#ef4444] rounded-full blur-[60px] opacity-10"></div>
+      <div class="flex justify-center mb-4">
+        <svg class="failure-x" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#ef4444" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      </div>
+      <h2 class="text-3xl text-[#ef4444] mb-2 m-0">Payment Failed</h2>
+      <p id="failure-reason" class="text-white text-lg font-medium mb-6">Insufficient funds</p>
+      <div class="text-xs text-[#64748b] bg-[#0a0f1e] py-2 px-4 rounded mb-6 border border-[#1e293b]">Reference: <span id="failure-txn-ref" class="font-mono text-white">--</span></div>
+      <div class="flex gap-2 w-full">
+        <button class="btn btn-primary flex-1" onclick="closeAllModals(); showPaymentForm(selectedMethod)">Retry</button>
+        <button class="btn btn-gray flex-1" onclick="closeAllModals()">Change Method</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="shortcuts-btn" class="fixed right-4 bottom-4 bg-[#1e293b] p-3 rounded-full cursor-pointer z-40 hover:bg-[#3b82f6] shadow-lg" title="Keyboard Shortcuts">
+     <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+  </div>
+  <div id="shortcuts-panel" class="shortcuts-panel hidden">
+     <h4 class="m-0 mb-3 text-sm border-b border-[#1e293b] pb-2 text-white">Shortcuts</h4>
+     <div class="shortcut-row"><span>Payment Tab</span><span class="shortcut-key">P</span></div>
+     <div class="shortcut-row"><span>Wallet Tab</span><span class="shortcut-key">W</span></div>
+     <div class="shortcut-row"><span>Transactions</span><span class="shortcut-key">T</span></div>
+     <div class="shortcut-row"><span>Refunds</span><span class="shortcut-key">R</span></div>
+     <div class="shortcut-row"><span>Dashboard</span><span class="shortcut-key">D</span></div>
+     <div class="shortcut-row"><span>Settings</span><span class="shortcut-key">S</span></div>
+     <div class="shortcut-row border-t border-[#1e293b] mt-2 pt-2"><span>Close Modals</span><span class="shortcut-key">Esc</span></div>
+  </div>
+
+  <div id="toast-container"></div>
+  <div id="loading-overlay" class="hidden"><div class="spinner mb-4"></div><div id="loading-text" class="text-white font-medium tracking-wide">Loading...</div></div>
+
+  <script src="/static/payment.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+{
+  "transactions": [
+    {
+      "id": "TXN-8A593C2A-9",
+      "slot_id": "B07",
+      "plate": "KA01AB1234",
+      "amount": 8.26,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-19T10:29:24.459633Z"
+    },
+    {
+      "id": "TXN-AF6EF05E-0",
+      "slot_id": "B07",
+      "plate": "KA01AB1234",
+      "amount": 8.26,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-19T10:22:12.592887Z"
+    },
+    {
+      "id": "TXN-29500EAA-7",
+      "slot_id": "B07",
+      "plate": "KA01AB1234",
+      "amount": 8.26,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-19T10:19:57.105329Z"
+    },
+    {
+      "id": "TXN-2D975A1D-3",
+      "slot_id": "B07",
+      "plate": "KA01AB1234",
+      "amount": 8.26,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-19T10:18:36.968254Z"
+    },
+    {
+      "id": "TXN-07EF3DFA-D",
+      "slot_id": "B07",
+      "plate": "KA01AB1234",
+      "amount": 8.26,
+      "method": "wallet",
+      "status": "failed",
+      "created_at": "2026-04-19T10:18:24.718709Z",
+      "failure_reason": "Insufficient funds"
+    },
+    {
+      "id": "TXN-ADDF68FA-8",
+      "slot_id": "C19",
+      "plate": "KA01AB6654",
+      "amount": 11.73,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-07T12:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-5864852B-F",
+      "slot_id": "C17",
+      "plate": "KA01AB7211",
+      "amount": 111.75,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-11T07:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-67FFF41E-B",
+      "slot_id": "A17",
+      "plate": "KA01AB4339",
+      "amount": 44.2,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-09T18:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-8E03B7D5-2",
+      "slot_id": "A11",
+      "plate": "KA01AB9426",
+      "amount": 27.46,
+      "method": "wallet",
+      "status": "refunded",
+      "created_at": "2026-04-10T02:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-61FFFB9A-E",
+      "slot_id": "D11",
+      "plate": "KA01AB9598",
+      "amount": 14.84,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-14T09:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-8D376F11-6",
+      "slot_id": "B09",
+      "plate": "KA01AB1382",
+      "amount": 79.3,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-10T05:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-E6BF65EA-7",
+      "slot_id": "D15",
+      "plate": "KA01AB6132",
+      "amount": 43.05,
+      "method": "netbanking",
+      "status": "refunded",
+      "created_at": "2026-04-12T05:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-1F88816F-D",
+      "slot_id": "A16",
+      "plate": "KA01AB4730",
+      "amount": 15.5,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-16T19:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-0BEF7725-5",
+      "slot_id": "C17",
+      "plate": "KA01AB2002",
+      "amount": 13.95,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-10T23:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-39594C32-1",
+      "slot_id": "A07",
+      "plate": "KA01AB4539",
+      "amount": 33.48,
+      "method": "netbanking",
+      "status": "success",
+      "created_at": "2026-04-09T18:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-02E4335C-5",
+      "slot_id": "D06",
+      "plate": "KA01AB6184",
+      "amount": 108.55,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-11T15:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-54834244-9",
+      "slot_id": "C13",
+      "plate": "KA01AB9953",
+      "amount": 108.3,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-16T05:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-41C74F19-5",
+      "slot_id": "D06",
+      "plate": "KA01AB3016",
+      "amount": 72.12,
+      "method": "upi",
+      "status": "success",
+      "created_at": "2026-04-11T09:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-F6220C27-8",
+      "slot_id": "D11",
+      "plate": "KA01AB2967",
+      "amount": 136.95,
+      "method": "upi",
+      "status": "success",
+      "created_at": "2026-04-12T11:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-5FF6E4F0-4",
+      "slot_id": "D20",
+      "plate": "KA01AB7044",
+      "amount": 40.06,
+      "method": "upi",
+      "status": "success",
+      "created_at": "2026-04-19T06:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-8A0D579C-2",
+      "slot_id": "C13",
+      "plate": "KA01AB9768",
+      "amount": 101.98,
+      "method": "cash",
+      "status": "success",
+      "created_at": "2026-04-06T23:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-251E9927-D",
+      "slot_id": "C20",
+      "plate": "KA01AB4401",
+      "amount": 137.76,
+      "method": "wallet",
+      "status": "success",
+      "created_at": "2026-04-13T20:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-8AAD8976-3",
+      "slot_id": "D20",
+      "plate": "KA01AB8728",
+      "amount": 26.23,
+      "method": "netbanking",
+      "status": "success",
+      "created_at": "2026-04-16T00:17:25.920595Z",
+      "failure_reason": null
+    },
+    {
+      "id": "TXN-62B75BDE-4",
+      "slot_id": "B18",
+      "plate": "KA01AB2124",
+      "amount": 35.45,
+      "method": "card",
+      "status": "failed",
+      "created_at": "2026-04-12T17:17:25.920595Z",
+      "failure_reason": "Insufficient funds"
+    },
+    {
+      "id": "TXN-3C9D7D62-0",
+      "slot_id": "C10",
+      "plate": "KA01AB3206",
+      "amount": 73.81,
+      "method": "card",
+      "status": "success",
+      "created_at": "2026-04-18T20:17:25.920595Z",
+      "failure_reason": null
+    }
+  ],
+  "wallet": {
+    "balance": 220.22000000000003,
+    "wallet_id": "WLT-A7K2M9",
+    "transactions": [
+      {
+        "id": "WTX-7EE25B58",
+        "date": "2026-04-19T10:29:27.666665Z",
+        "description": "Payment for parking",
+        "type": "debit",
+        "amount": 8.26
+      },
+      {
+        "id": "WTX-D8E5BD1D",
+        "date": "2026-04-19T10:22:15.703634Z",
+        "description": "Payment for parking",
+        "type": "debit",
+        "amount": 8.26
+      },
+      {
+        "id": "WTX-606B9C70",
+        "date": "2026-04-19T10:20:00.371427Z",
+        "description": "Payment for parking",
+        "type": "debit",
+        "amount": 8.26
+      },
+      {
+        "id": "WTX-7C923EAD",
+        "date": "2026-04-19T10:18:40.121206Z",
+        "description": "Payment for parking",
+        "type": "debit",
+        "amount": 8.26
+      },
+      {
+        "id": "WTX-76992FF0",
+        "date": "2026-04-19T10:18:19.148130Z",
+        "description": "Added to Wallet via Card",
+        "type": "credit",
+        "amount": 8.26
+      },
+      {
+        "id": "WTX-576DE648",
+        "date": "2026-04-11T10:17:25.920595Z",
+        "description": "Added to Wallet",
+        "type": "credit",
+        "amount": 50.0
+      },
+      {
+        "id": "WTX-B43398B1",
+        "date": "2026-03-24T10:17:25.920595Z",
+        "description": "Added to Wallet",
+        "type": "credit",
+        "amount": 50.0
+      },
+      {
+        "id": "WTX-13C527C2",
+        "date": "2026-04-17T10:17:25.920595Z",
+        "description": "Added to Wallet",
+        "type": "credit",
+        "amount": 50.0
+      },
+      {
+        "id": "WTX-2F3234DA",
+        "date": "2026-03-22T10:17:25.920595Z",
+        "description": "Added to Wallet",
+        "type": "credit",
+        "amount": 50.0
+      },
+      {
+        "id": "WTX-1578FCD0",
+        "date": "2026-04-15T10:17:25.920595Z",
+        "description": "Added to Wallet",
+        "type": "credit",
+        "amount": 50.0
+      }
+    ]
+  },
+  "refunds": [],
+  "saved_cards": [
+    {
+      "id": "sc1",
+      "last4": "4532",
+      "type": "Visa",
+      "expiry": "12/26",
+      "name": "John Doe"
+    },
+    {
+      "id": "sc2",
+      "last4": "8923",
+      "type": "Mastercard",
+      "expiry": "09/25",
+      "name": "John Doe"
+    }
+  ],
+  "discount_codes": [
+    {
+      "code": "PARK10",
+      "type": "percent",
+      "value": 10,
+      "max_uses": 100,
+      "used": 14,
+      "expiry": "2025-12-31"
+    },
+    {
+      "code": "FIRST50",
+      "type": "flat",
+      "value": 50,
+      "max_uses": 1,
+      "used": 0,
+      "expiry": "2025-12-31"
+    },
+    {
+      "code": "WEEKEND20",
+      "type": "percent",
+      "value": 20,
+      "max_uses": 50,
+      "used": 8,
+      "expiry": "2025-12-31"
+    }
+  ],
+  "settings": {
+    "payment_methods": {
+      "card": true,
+      "upi": true,
+      "netbanking": true,
+      "wallet": true,
+      "emi": true,
+      "cash": true
+    },
+    "platform_fee": {
+      "type": "flat",
+      "amount": 2.0
+    },
+    "gst_rate": 18,
+    "otp_timeout": 300,
+    "max_otp_attempts": 3,
+    "transaction_limit_daily": 10000,
+    "notifications": {
+      "sms": true,
+      "email": true,
+      "whatsapp": false,
+      "phone": "9876540123",
+      "email_addr": "user@example.com"
+    }
+  },
+  "otp_sessions": {
+    "TXN-07EF3DFA-D": {
+      "attempts": 0,
+      "max": 3
+    },
+    "TXN-2D975A1D-3": {
+      "attempts": 0,
+      "max": 3
+    },
+    "TXN-29500EAA-7": {
+      "attempts": 0,
+      "max": 3
+    },
+    "TXN-AF6EF05E-0": {
+      "attempts": 0,
+      "max": 3
+    },
+    "TXN-8A593C2A-9": {
+      "attempts": 0,
+      "max": 3
+    }
+  }
+}

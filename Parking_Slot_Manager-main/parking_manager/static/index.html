@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" type="image/png" href="/static/assets/logo.png">
+  <title>SmartPark — Parking Manager</title>
+</head>
+<body>
+  <!-- Particles background -->
+  <div id="tsparticles" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-area flex items-center gap-3 p-5 cursor-pointer" onclick="showPage('dashboard')">
+      <span class="text-xl font-bold tracking-wide" style="font-family:'Syne',sans-serif;color:var(--text-primary);">SmartPark</span>
+    </div>
+    <ul class="nav-links flex flex-col mt-4">
+      <li class="nav-link active flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Dashboard</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="slots">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M4 19h16v-2h-2V7a2 2 0 00-2-2H8a2 2 0 00-2 2v10H4v2zm4-12h8v10H8V7z"></path></svg>
+        <span>Parking Slots</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="reservations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        <span>Reservations</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="vehicles">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.8l-1.4 2A2 2 0 002 11.2V16c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+        <span>Vehicles</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="transactions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+        <span>Transactions</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all relative" data-page="alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg>
+        <span>Alerts</span>
+        <span id="alert-badge" class="badge badge-red ml-auto hidden">0</span>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="memberships">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><path d="M12 11c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+        <span>Memberships</span>
+      </li>
+      <li>
+        <a class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="3dview" onclick="window.open('/static/parking_3d.html','_blank')">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          <span>3D View</span>
+        </a>
+      </li>
+      <li class="nav-link flex items-center gap-3 px-5 py-3 cursor-pointer transition-all" data-page="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.6.8.96 1.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </li>
+    </ul>
+
+    <div class="bottom-stats absolute bottom-0 w-full border-t border-[var(--border)] p-4 flex justify-between items-center bg-[var(--sidebar)]">
+      <div class="text-center w-1/2 border-r border-[var(--border)]">
+        <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Available</div>
+        <div id="available-count" class="font-bold text-[var(--green)] text-lg">0</div>
+      </div>
+      <div class="text-center w-1/2">
+        <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wide">Occupied</div>
+        <div id="occupied-count" class="font-bold text-[var(--red)] text-lg">0</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="flex items-center gap-4">
+        <button id="hamburger" class="hidden text-[var(--text-primary)]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-6 h-6"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+        <h2 id="page-title" class="text-lg m-0 text-[var(--text-primary)]">Dashboard</h2>
+      </div>
+
+      <div class="search-wrapper flex items-center relative">
+        <input type="text" id="global-search" placeholder="Search slot ID or plate..." class="w-[300px]">
+        <div id="search-dropdown"></div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button id="btn-shift-drawer" class="btn btn-outline border-[#f59e0b] text-[#f59e0b] text-xs px-3 py-1 hidden" onclick="openShiftModal()">Shift: CLOSED</button>
+        <div class="relative cursor-pointer" onclick="showPage('alerts')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5 text-[#64748b] hover:text-white transition-colors"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 01-3.46 0"></path></svg>
+          <span id="header-alert-badge" class="absolute -top-1 -right-1 w-4 h-4 bg-[#ff4444] text-white text-[10px] font-bold flex items-center justify-center rounded-full hidden">0</span>
+        </div>
+        <button id="theme-toggle" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--border)] hover:bg-[var(--cyan)] hover:text-[var(--bg-dark)] transition-all border-0 cursor-pointer" aria-label="Toggle Dark Mode">
+          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-text" class="text-xs font-medium hidden sm:inline">Dark Mode</span>
+        </button>
+        <div class="text-sm font-semibold text-[var(--text-primary)]">SmartPark Central</div>
+      </div>
+    </header>
+
+    <!-- Page sections -->
+    <div class="page-content relative z-10 w-full box-border">
+      
+      <!-- DASHBOARD -->
+      <section id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card border-t-2 border-t-[#00d4ff]">
+            <div class="stat-label">Total Slots</div>
+            <div id="dashboard-total" class="stat-value text-[#00d4ff]">0</div>
+          </div>
+          <div class="stat-card border-t-2 border-t-[#00e676]">
+            <div class="stat-label">Available</div>
+            <div id="dashboard-available" class="stat-value text-[#00e676]">0</div>
+          </div>
+          <div class="stat-card border-t-2 border-t-[#ff4444]">
+            <div class="stat-label">Occupied</div>
+            <div id="dashboard-occupied" class="stat-value text-[#ff4444]">0</div>
+          </div>
+          <div class="stat-card border-t-2 border-t-[#ffaa00]">
+            <div class="stat-label">Reserved</div>
+            <div id="dashboard-reserved" class="stat-value text-[#ffaa00]">0</div>
+          </div>
+          <div class="stat-card border-t-2 border-t-[#475569]">
+            <div class="stat-label">Maintenance</div>
+            <div id="dashboard-maintenance" class="stat-value text-[#94a3b8]">0</div>
+          </div>
+        </div>
+
+        <div class="stat-card mt-5 relative w-full overflow-hidden" style="padding:24px;">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-lg m-0">Live Occupancy</h3>
+            <span id="occupancy-text" class="text-xl font-bold text-[var(--text-primary)]">0%</span>
+          </div>
+          <div class="occupancy-track w-full">
+            <div id="occupancy-bar" class="occupancy-fill" style="width: 0%"></div>
+          </div>
+
+          <div class="grid grid-cols-4 gap-6 mt-6">
+            <div>
+              <div class="flex justify-between text-xs text-[#64748b] mb-1"><span>Zone A</span><span id="zone-a-text">0%</span></div>
+              <div class="mini-bar-track w-full"><div id="zone-a-bar" class="mini-bar-fill bg-[#00d4ff]" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-[#64748b] mb-1"><span>Zone B</span><span id="zone-b-text">0%</span></div>
+              <div class="mini-bar-track w-full"><div id="zone-b-bar" class="mini-bar-fill bg-[#00e676]" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-[#64748b] mb-1"><span>Zone C</span><span id="zone-c-text">0%</span></div>
+              <div class="mini-bar-track w-full"><div id="zone-c-bar" class="mini-bar-fill bg-[#ffaa00]" style="width:0%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs text-[#64748b] mb-1"><span>Zone D</span><span id="zone-d-text">0%</span></div>
+              <div class="mini-bar-track w-full"><div id="zone-d-bar" class="mini-bar-fill bg-[#a855f7]" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid w-full">
+          <!-- Revenue Chart -->
+          <div class="chart-container flex flex-col w-full h-[320px]">
+             <h3 class="text-base text-[#f1f5f9] mb-3 m-0">Revenue (Last 7 Days)</h3>
+             <div class="relative flex-1 w-full"><canvas id="revenue-chart"></canvas></div>
+          </div>
+
+          <!-- Insights & Activity -->
+          <div class="flex flex-col gap-5 w-full">
+            <div class="grid grid-cols-2 gap-5">
+               <div class="stat-card !p-4 border-l-4 border-l-[#a855f7]">
+                 <div class="text-xs text-[#64748b] uppercase tracking-wide">Peak Hour</div>
+                 <div id="peak-hour" class="text-xl font-bold mt-1 text-[#a855f7]">--</div>
+               </div>
+               <div class="stat-card !p-4 border-l-4 border-l-[#00d4ff]">
+                 <div class="text-xs text-[#64748b] uppercase tracking-wide">Most Used Slot</div>
+                 <div id="top-slot" class="text-xl font-bold mt-1 text-[#00d4ff]">--</div>
+               </div>
+            </div>
+            <div class="stat-card flex-1 overflow-hidden">
+               <h3 class="text-base text-[#f1f5f9] mb-3 m-0">Recent Activity</h3>
+               <ul id="recent-activity-list" class="m-0 p-0 list-none flex flex-col gap-2 overflow-y-auto max-h-[160px]"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLOTS -->
+      <section id="page-slots" class="hidden w-full">
+        <div class="flex flex-wrap gap-4 mb-6 items-center bg-[var(--table-alt)] p-4 rounded-xl border border-[var(--border)]">
+           <div class="flex flex-col gap-1">
+             <label>Zone</label>
+             <select id="filter-zone"><option>All</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+           </div>
+           <div class="flex flex-col gap-1">
+             <label>Floor</label>
+             <select id="filter-floor"><option>All</option><option>1</option><option>2</option><option>3</option></select>
+           </div>
+           <div class="flex flex-col gap-1">
+             <label>Type</label>
+             <select id="filter-type"><option>All</option><option value="standard">Standard</option><option value="handicap">Handicap</option><option value="ev">EV</option><option value="vip">VIP</option><option value="compact">Compact</option></select>
+           </div>
+           <div class="flex flex-col gap-1">
+             <label>Status</label>
+             <select id="filter-status"><option>All</option><option value="available">Available</option><option value="occupied">Occupied</option><option value="reserved">Reserved</option><option value="maintenance">Maintenance</option></select>
+           </div>
+        </div>
+        <div id="slots-grid" class="w-full"></div>
+      </section>
+
+      <!-- RESERVATIONS -->
+      <section id="page-reservations" class="hidden w-full">
+        <div class="stat-card mb-6">
+          <h3 class="m-0 mb-4 text-[var(--text-primary)]">New Reservation</h3>
+          <form id="reservation-form" class="flex flex-wrap gap-4 items-end">
+             <div class="flex flex-col gap-1 flex-1 min-w-[150px]">
+               <label>Slot</label>
+               <select id="res-slot" required></select>
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[150px]">
+               <label>Name</label>
+               <input type="text" id="res-name" required>
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[120px]">
+               <label>Phone</label>
+               <input type="text" id="res-phone" required pattern="[0-9]{10}">
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[130px]">
+               <label>Date</label>
+               <input type="date" id="res-date" required>
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[100px]">
+               <label>Time</label>
+               <input type="time" id="res-time" required>
+             </div>
+             <div class="flex flex-col gap-1 w-[80px]">
+               <label>Hrs</label>
+               <select id="res-dur"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="8">8</option><option value="24">24</option></select>
+             </div>
+             <button type="submit" class="btn btn-primary h-[38px]">Reserve Slot</button>
+          </form>
+        </div>
+
+        <div class="table-wrapper relative z-10">
+          <table>
+            <thead><tr><th>ID</th><th>Slot</th><th>Name</th><th>Phone</th><th>From</th><th>Until</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="reservations-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VEHICLES -->
+      <section id="page-vehicles" class="hidden w-full">
+        <div class="mb-5 flex justify-between items-end">
+          <h3 class="m-0 font-bold text-xl">Currently Parked</h3>
+          <input type="text" id="vehicle-search" placeholder="Filter by plate..." class="w-[200px]">
+        </div>
+        <div class="table-wrapper mb-8 relative z-10 w-full">
+          <table>
+            <thead><tr><th>Plate</th><th>Type</th><th>Owner</th><th>Phone</th><th>Slot</th><th>Entry Time</th><th>Duration</th><th>Est. Fee</th></tr></thead>
+            <tbody id="vehicles-table-body"></tbody>
+          </table>
+        </div>
+
+        <h3 class="m-0 mb-4 font-bold text-xl">Vehicle History</h3>
+        <div class="table-wrapper relative z-10 w-full h-[400px] overflow-y-auto">
+          <table>
+            <thead class="sticky top-0 bg-[#0d1117] z-20"><tr><th>Plate</th><th>Owner</th><th>Slot</th><th>Entry</th><th>Exit</th><th>Duration</th><th>Fee Paid</th></tr></thead>
+            <tbody id="vehicles-history-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section id="page-transactions" class="hidden w-full">
+        <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+          <div class="stat-card !border-[#00e676] !flex-row items-center gap-4 py-3 px-5">
+            <span class="text-sm uppercase tracking-wide text-[#64748b]">Total Revenue:</span>
+            <span id="total-revenue-display" class="text-2xl font-bold text-[#00e676]">₹ 0.00</span>
+          </div>
+
+          <div class="flex items-center gap-3">
+             <input type="date" id="tx-from">
+             <span class="text-[#64748b]">to</span>
+             <input type="date" id="tx-to">
+             <button id="btn-tx-filter" class="btn btn-primary">Filter</button>
+             <button id="btn-export-csv" class="btn btn-gray ml-2">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper relative z-10 w-full">
+          <table>
+            <thead><tr><th>TX ID</th><th>Slot</th><th>Plate</th><th>Owner</th><th>Entry</th><th>Exit</th><th>Duration</th><th>Amount</th></tr></thead>
+            <tbody id="transactions-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- MEMBERSHIPS -->
+      <section id="page-memberships" class="hidden w-full">
+        <div class="stat-card mb-6">
+          <h3 class="m-0 mb-4 text-[#f1f5f9]">Register New Member</h3>
+          <form id="membership-form" class="flex flex-wrap gap-4 items-end">
+             <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+               <label>Name</label>
+               <input type="text" id="mem-name" required>
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[150px]">
+               <label>License Plate</label>
+               <input type="text" id="mem-plate" class="uppercase" required>
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[120px]">
+               <label>Phone</label>
+               <input type="text" id="mem-phone" required pattern="[0-9]{10}">
+             </div>
+             <div class="flex flex-col gap-1 flex-1 min-w-[150px]">
+               <label>Expiry Date</label>
+               <input type="date" id="mem-expiry" required>
+             </div>
+             <button type="submit" class="btn btn-primary h-[38px]">Register</button>
+          </form>
+        </div>
+
+        <div class="table-wrapper relative z-10">
+          <table>
+            <thead><tr><th>Name</th><th>Plate</th><th>Phone</th><th>Expiry Date</th><th>Actions</th></tr></thead>
+            <tbody id="memberships-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ALERTS -->
+      <section id="page-alerts" class="hidden w-full">
+        <div id="alerts-list" class="flex flex-col gap-4 relative z-10"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="page-settings" class="hidden w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 w-full">
+          <div class="stat-card flex flex-col">
+            <h3 class="m-0 mb-4 border-b border-[#1e2a3a] pb-2">General Settings</h3>
+            <div class="flex flex-col gap-4">
+              <div><label>Facility Name</label><input type="text" id="setting-facility-name" class="w-full"></div>
+              <div class="flex gap-4">
+                <div class="flex-1"><label>Open Time</label><input type="time" id="setting-open-time" class="w-full"></div>
+                <div class="flex-1"><label>Close Time</label><input type="time" id="setting-close-time" class="w-full"></div>
+              </div>
+              <div class="flex gap-4">
+                <div class="flex-1"><label>Grace Period (mins)</label><input type="number" id="setting-grace-period" class="w-full"></div>
+                <div class="flex-1"><label>Max Reservation (hrs)</label><input type="number" id="setting-max-reservation" class="w-full"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card flex flex-col">
+            <h3 class="m-0 mb-4 border-b border-[#1e2a3a] pb-2">Hourly Rates (₹)</h3>
+            <div class="flex flex-col gap-3">
+              <div class="flex justify-between items-center"><label class="m-0 w-24">Standard</label><input type="number" step="0.5" id="rate-standard" class="w-24 text-right"></div>
+              <div class="flex justify-between items-center"><label class="m-0 w-24">Handicap</label><input type="number" step="0.5" id="rate-handicap" class="w-24 text-right"></div>
+              <div class="flex justify-between items-center"><label class="m-0 w-24">EV</label><input type="number" step="0.5" id="rate-ev" class="w-24 text-right"></div>
+              <div class="flex justify-between items-center"><label class="m-0 w-24">VIP</label><input type="number" step="0.5" id="rate-vip" class="w-24 text-right"></div>
+              <div class="flex justify-between items-center"><label class="m-0 w-24">Compact</label><input type="number" step="0.5" id="rate-compact" class="w-24 text-right"></div>
+            </div>
+          </div>
+
+          <div class="stat-card md:col-span-2">
+            <h3 class="m-0 mb-4 border-b border-[#1e2a3a] pb-2 text-[#ff4444]">Security / Blacklist</h3>
+            <div class="flex flex-col gap-4">
+              <form id="blacklist-form" class="flex items-end gap-3 mb-2">
+                <div class="flex-1">
+                  <label>Banned License Plate</label>
+                  <input type="text" id="bl-plate" class="w-full uppercase" required>
+                </div>
+                <div class="flex-1">
+                  <label>Reason</label>
+                  <input type="text" id="bl-reason" class="w-full" required>
+                </div>
+                <button type="submit" class="btn btn-danger h-[38px] px-4">Ban</button>
+              </form>
+              <div class="table-wrapper max-h-[160px] overflow-y-auto">
+                <table class="w-full text-xs">
+                  <thead><tr><th>Plate</th><th>Reason</th><th>Action</th></tr></thead>
+                  <tbody id="blacklist-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 flex justify-between relative z-10">
+           <button id="btn-save-settings" class="btn btn-primary px-8">Save Settings</button>
+           <button id="btn-reset-data" class="btn btn-danger">Reset & Reseed Data</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="modal-slot" class="modal-overlay">
+    <div class="modal-box">
+      <span class="modal-close" onclick="closeAllModals()">×</span>
+      <div id="slot-modal-content"></div>
+    </div>
+  </div>
+
+  <div id="modal-checkin" class="modal-overlay">
+    <div class="modal-box">
+      <span class="modal-close" onclick="closeAllModals()">×</span>
+      <h3 class="m-0 mb-4 text-xl">Check-In Vehicle</h3>
+      <form id="checkin-form" class="flex flex-col gap-4">
+        <div><label>License Plate</label><input type="text" id="ci-plate" class="w-full uppercase" required placeholder="e.g. KA01AB1234"></div>
+        <div><label>Vehicle Type</label><select id="ci-type" class="w-full"><option>Car</option><option>SUV</option><option>Bike</option><option>Truck</option></select></div>
+        <div><label>Owner Name</label><input type="text" id="ci-owner" class="w-full" required></div>
+        <div><label>Phone Number</label><input type="text" id="ci-phone" class="w-full" required pattern="[0-9]{10}"></div>
+        <button type="submit" class="btn btn-primary mt-2">Confirm Check-In</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="modal-checkout" class="modal-overlay">
+    <div class="modal-box text-center">
+      <span class="modal-close" onclick="closeAllModals()">×</span>
+      <h3 class="m-0 mb-2 text-xl text-[var(--cyan)]">Check-Out Processing</h3>
+      <div id="checkout-receipt-content" class="bg-[var(--table-alt)] rounded-lg p-4 mb-4 text-left text-sm flex flex-col gap-2"></div>
+      <div class="text-[var(--text-muted)] uppercase text-xs tracking-wider">Total Fee Payable</div>
+      <div id="checkout-fee-display" class="text-4xl font-bold text-[var(--cyan)] my-2">₹ 0.00</div>
+      <button id="btn-confirm-checkout" class="btn btn-primary w-full mt-4">Process Payment & Generate Receipt</button>
+    </div>
+  </div>
+
+  <!-- Detailed Receipt Modal -->
+  <div id="modal-receipt" class="modal-overlay">
+    <div class="modal-box max-w-[450px] !p-0 overflow-hidden bg-white text-black">
+      <div class="receipt-paper p-8 font-mono text-xs relative">
+        <span class="modal-close !text-gray-400" onclick="closeAllModals()">×</span>
+        
+        <div id="receipt-printable-area">
+          <div class="text-center mb-6 border-b-2 border-dashed border-gray-300 pb-4">
+            <h2 id="rec-facility-name" class="text-xl font-bold uppercase m-0 tracking-tighter">SmartPark Central</h2>
+            <div id="rec-location" class="text-[10px]">Sector 5, Downtown</div>
+            <div id="rec-address" class="text-[10px]">123 Tech Park Ave, Silicon City</div>
+            <div id="rec-contact" class="text-[10px]">Contact: +91 98765 43210</div>
+            <div id="rec-gst" class="text-[10px] mt-1 font-bold">GST: 29AAAAA0000A1Z5</div>
+          </div>
+
+          <div class="mb-4">
+            <div class="flex justify-between"><span>Receipt No:</span><span id="rec-id" class="font-bold">#12345</span></div>
+            <div class="flex justify-between"><span>Date:</span><span id="rec-date">2026-04-21</span></div>
+            <div class="flex justify-between"><span>Time:</span><span id="rec-time">14:30</span></div>
+          </div>
+
+          <div class="mb-4 border-t border-b border-dashed border-gray-300 py-2">
+            <div class="font-bold mb-1 uppercase text-[10px]">Vehicle Details</div>
+            <div class="flex justify-between"><span>Plate:</span><span id="rec-plate" class="font-bold uppercase">KA01AB1234</span></div>
+            <div class="flex justify-between"><span>Type:</span><span id="rec-type" class="capitalize">Car</span></div>
+            <div class="flex justify-between"><span>Slot:</span><span id="rec-slot" class="font-bold">A01 (Zone A)</span></div>
+          </div>
+
+          <div class="mb-4">
+            <div class="font-bold mb-1 uppercase text-[10px]">Parking Duration</div>
+            <div class="flex justify-between"><span>Entry:</span><span id="rec-entry">04/21 10:00 AM</span></div>
+            <div class="flex justify-between"><span>Exit:</span><span id="rec-exit">04/21 02:30 PM</span></div>
+            <div class="flex justify-between"><span>Total Duration:</span><span id="rec-duration" class="font-bold">4h 30m</span></div>
+          </div>
+
+          <div class="mb-6 border-t-2 border-dashed border-gray-300 pt-4">
+            <div class="flex justify-between"><span>Hourly Rate:</span><span id="rec-rate">₹ 2.00</span></div>
+            <div class="flex justify-between"><span>Subtotal:</span><span id="rec-subtotal">₹ 9.00</span></div>
+            <div class="flex justify-between"><span>GST (18%):</span><span id="rec-tax">₹ 1.62</span></div>
+            <div id="rec-discount-row" class="flex justify-between text-green-600 hidden"><span>Discount:</span><span id="rec-discount">-₹ 0.00</span></div>
+            <div class="flex justify-between text-lg font-bold mt-2 border-t border-gray-200 pt-2">
+              <span>TOTAL PAID:</span>
+              <span id="rec-total">₹ 10.62</span>
+            </div>
+          </div>
+
+          <div class="mb-6 bg-gray-50 p-2 rounded text-[10px]">
+            <div class="flex justify-between"><span>Payment Mode:</span><span id="rec-method" class="uppercase">Cash</span></div>
+            <div class="flex justify-between"><span>Ref ID:</span><span id="rec-ref" class="text-[9px]">TXN-123456789</span></div>
+            <div class="flex justify-between"><span>Status:</span><span class="text-green-600 font-bold">PAID</span></div>
+          </div>
+
+          <div class="text-center">
+             <div class="flex justify-center mb-4">
+               <div id="rec-qr" class="w-24 h-24 bg-gray-100 flex items-center justify-center text-[8px] text-gray-400 border border-gray-200">QR Code</div>
+             </div>
+             <div class="text-[9px] text-gray-500 italic mb-2">"Parking at owner's risk. Not responsible for any loss or damage."</div>
+             <div class="font-bold text-xs">THANK YOU FOR PARKING WITH US!</div>
+             <div class="text-[10px] text-gray-400 mt-2">Operator ID: SP-001</div>
+          </div>
+        </div>
+
+        <div class="mt-8 flex gap-3 no-print">
+          <button onclick="window.print()" class="btn btn-primary flex-1 bg-black text-white hover:bg-gray-800">Print Receipt</button>
+          <button onclick="closeAllModals()" class="btn btn-gray flex-1 border border-gray-300">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-confirm" class="modal-overlay">
+    <div class="modal-box text-center max-w-[400px]">
+      <h3 class="m-0 mb-3 text-xl text-[var(--text-primary)]">Are you sure?</h3>
+      <p id="confirm-msg" class="text-[var(--text-muted)] mb-6"></p>
+      <div class="flex gap-3 justify-center">
+        <button onclick="closeAllModals()" class="btn btn-gray px-6">Cancel</button>
+        <button id="btn-do-confirm" class="btn btn-danger px-6">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-shift" class="modal-overlay">
+    <div class="modal-box text-center max-w-[400px]">
+      <span class="modal-close" onclick="closeAllModals()">×</span>
+      <h3 class="m-0 mb-3 text-xl text-[var(--text-primary)]">Shift Management</h3>
+      <div id="shift-status" class="mb-4 text-[var(--text-muted)]"></div>
+      <div class="bg-[var(--table-alt)] rounded-lg p-5 mb-4 text-left text-sm flex flex-col gap-3">
+        <div class="flex justify-between border-b border-[var(--border)] pb-2">
+          <span class="text-[var(--text-muted)]">Shift Start Time</span>
+          <span id="shift-start-time" class="font-bold">--</span>
+        </div>
+        <div class="flex justify-between items-center pt-2">
+          <span class="text-[var(--text-muted)]">Expected Cash Collected</span>
+          <span id="shift-expected-cash" class="font-bold text-2xl text-[#10b981]">₹ 0.00</span>
+        </div>
+      </div>
+      <button id="btn-close-shift" class="btn btn-primary w-full">Close Shift & Reconcile</button>
+    </div>
+  </div>
+
+  <div id="modal-qr" class="modal-overlay">
+    <div class="modal-box text-center max-w-[350px]">
+      <span class="modal-close" onclick="closeAllModals()">×</span>
+      <h3 class="m-0 mb-2 text-xl text-[#00d4ff]">Self-Service Check-In</h3>
+      <p class="text-sm text-[#64748b] mb-4">Scan QR code to check in at Slot <span id="qr-slot-id" class="font-bold text-white"></span></p>
+      <div class="bg-white p-4 rounded-lg inline-block w-[200px] h-[200px] flex items-center justify-center">
+         <img id="qr-image" src="" alt="QR Code" class="w-full h-full object-contain hidden">
+         <div id="qr-loading" class="text-[#0f172a] font-bold">Generating...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

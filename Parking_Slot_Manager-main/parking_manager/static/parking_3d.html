@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/static/parking_3d.css">
+  <link rel="icon" type="image/png" href="/static/assets/logo.png">
+  <title>SmartPark 3D View</title>
+</head>
+<body>
+  <!-- Three.js renders here -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- UI Overlays (HTML over canvas) -->
+  <div id="overlay-topleft">
+    <button id="btn-back">← Dashboard</button>
+    <div class="flex items-center gap-2 mt-2">
+      <h1 class="m-0">SmartPark 3D</h1>
+    </div>
+  </div>
+
+  <div id="overlay-topright">
+    <div id="live-stats">
+      <div class="stat-row"><span class="dot green"></span><span id="stat-available">--</span> Available</div>
+      <div class="stat-row"><span class="dot red"></span><span id="stat-occupied">--</span> Occupied</div>
+      <div class="stat-row"><span class="dot amber"></span><span id="stat-reserved">--</span> Reserved</div>
+      <div class="stat-row"><span class="dot gray"></span><span id="stat-maintenance">--</span> Maintenance</div>
+      <div id="last-sync">Last sync: --</div>
+    </div>
+  </div>
+
+  <div id="overlay-topcenter">
+    <input id="slot-search" type="text" placeholder="Search slot ID...">
+  </div>
+
+  <div id="overlay-bottomleft">
+    <div id="camera-legend">
+      <div>🖱 Drag — Orbit</div>
+      <div>🖱 Scroll — Zoom</div>
+      <div>🖱 Right — Pan</div>
+      <div>R — Reset Camera</div>
+      <div>Space — Auto Rotate</div>
+    </div>
+  </div>
+
+  <div id="overlay-bottomcenter">
+    <div id="floor-tabs">
+      <button class="floor-tab active" data-floor="all">All Floors</button>
+      <button class="floor-tab" data-floor="1">Floor 1</button>
+      <button class="floor-tab" data-floor="2">Floor 2</button>
+      <button class="floor-tab" data-floor="3">Floor 3</button>
+    </div>
+  </div>
+
+  <div id="overlay-bottomright">
+    <div id="type-legend">
+      <div style="display:flex;align-items:center;"><span class="swatch green"></span> Available</div>
+      <div style="display:flex;align-items:center;"><span class="swatch red"></span> Occupied</div>
+      <div style="display:flex;align-items:center;"><span class="swatch amber"></span> Reserved</div>
+      <div style="display:flex;align-items:center;"><span class="swatch gray"></span> Maintenance</div>
+      <div style="margin-top:4px;">🚗 Car &nbsp; 🚛 Truck &nbsp; 🏍 Bike &nbsp; 🚙 SUV</div>
+    </div>
+  </div>
+
+  <!-- Slot info panel (right side, hidden by default) -->
+  <div id="slot-info-panel" class="hidden">
+    <button id="close-slot-info">×</button>
+    <div id="slot-info-content"></div>
+    <div id="slot-info-actions"></div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container-3d"></div>
+
+  <script type="module" src="/static/parking_3d.js"></script>
+</body>
+</html>
